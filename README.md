@@ -1,1 +1,1 @@
-# spark-analytics
+# spark-ml-graphx
