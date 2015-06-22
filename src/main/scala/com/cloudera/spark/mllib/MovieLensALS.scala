@@ -98,6 +98,9 @@ object MovieLensALS {
 
   def run(params: Params) {
     val conf = new SparkConf().setAppName(s"MovieLensALS with $params")
+
+    SparkConfUtil.setConf(conf)
+
     if (params.kryo) {
       conf.registerKryoClasses(Array(classOf[mutable.BitSet], classOf[Rating]))
         .set("spark.kryoserializer.buffer.mb", "8")
