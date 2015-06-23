@@ -110,10 +110,11 @@ public final class JavaMovieLensALS {
 
         ratings.unpersist();
 
+        // train
         ALS als = new ALS().setRank(rank).setIterations(iterations).setLambda(lambda);
-
         MatrixFactorizationModel model = als.run(training);
 
+        // compute RMSE
         double rmse = computeRmse(model, test);
 
         System.out.println("Test RMSE = "+rmse);
@@ -154,16 +155,18 @@ public final class JavaMovieLensALS {
             }
         });
 
+        // join predictions to test data
         JavaRDD<Tuple2<Double, Double>> origPredRatingRDD =  predictionsPair.join(dataPair).values();
 
-        JavaDoubleRDD rmseRDD = origPredRatingRDD.mapToDouble(new DoubleFunction<Tuple2<Double, Double>>() {
+        // compute rmse
+        JavaDoubleRDD errorRDD = origPredRatingRDD.mapToDouble(new DoubleFunction<Tuple2<Double, Double>>() {
             @Override
             public double call(Tuple2<Double, Double> doubleDoubleTuple2) throws Exception {
                 return (doubleDoubleTuple2._1() - doubleDoubleTuple2._2()) * (doubleDoubleTuple2._1() - doubleDoubleTuple2._2());
             }
         });
 
-        double rmse = rmseRDD.mean();
+        double rmse = errorRDD.mean();
 
         return rmse;
     }
