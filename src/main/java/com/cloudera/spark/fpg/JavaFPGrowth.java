@@ -57,6 +57,25 @@ public class JavaFPGrowth {
         SparkConfUtil.setConf(sparkConf);
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
+        // create RDD
+        JavaRDD<ArrayList<String>> transactions = createRDD(sc, inputFile);
+
+        // run fpg
+        FPGrowthModel<String> model = new FPGrowth()
+                .setMinSupport(minSupport)
+                .setNumPartitions(numPartition)
+                .run(transactions);
+
+        // print results
+        for (FPGrowth.FreqItemset<String> s: model.freqItemsets().toJavaRDD().collect()) {
+            System.out.println("[" + Joiner.on(",").join(s.javaItems()) + "], " + s.freq());
+        }
+
+        sc.stop();
+    }
+
+    public static JavaRDD<ArrayList<String>> createRDD(JavaSparkContext sc, String inputFile) {
+
         JavaRDD<ArrayList<String>> transactions = sc.textFile(inputFile).map(
                 new Function<String, ArrayList<String>>() {
                     @Override
@@ -66,15 +85,6 @@ public class JavaFPGrowth {
                 }
         );
 
-        FPGrowthModel<String> model = new FPGrowth()
-                .setMinSupport(minSupport)
-                .setNumPartitions(numPartition)
-                .run(transactions);
-
-        for (FPGrowth.FreqItemset<String> s: model.freqItemsets().toJavaRDD().collect()) {
-            System.out.println("[" + Joiner.on(",").join(s.javaItems()) + "], " + s.freq());
-        }
-
-        sc.stop();
+        return transactions;
     }
 }
