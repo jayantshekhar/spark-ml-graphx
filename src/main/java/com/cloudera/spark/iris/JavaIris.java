@@ -10,6 +10,7 @@ import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -65,6 +66,12 @@ public class JavaIris {
 
         // create RDD
         JavaRDD<Vector> points = createRDD(sc, inputFile);
+
+        // print the first 5 records
+        List<Vector> list = points.take(5);
+        for (Vector v : list) {
+            System.out.println(v.toString());
+        }
 
         // cluster
         cluster(points, k, iterations, runs);
