@@ -9,6 +9,8 @@ import org.apache.spark.mllib.clustering.KMeans;
 import org.apache.spark.mllib.clustering.KMeansModel;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
+import org.apache.spark.mllib.stat.MultivariateStatisticalSummary;
+import org.apache.spark.mllib.stat.Statistics;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -73,10 +75,22 @@ public class JavaIris {
             System.out.println(v.toString());
         }
 
+        // print summary statistics
+        summaryStatistics(points);
+
         // cluster
         cluster(points, k, iterations, runs);
 
         sc.stop();
+    }
+
+    public static void summaryStatistics(JavaRDD<Vector> points) {
+
+        // Compute column summary statistics.
+        MultivariateStatisticalSummary summary = Statistics.colStats(points.rdd());
+        System.out.println("Mean : " + summary.mean()); // a dense vector containing the mean value for each column
+        System.out.println("Variance : "+summary.variance()); // column-wise variance
+        System.out.println("Non-zeros : "+summary.numNonzeros()); // number of nonzeros in each column
     }
 
     public static void cluster(JavaRDD<Vector> points, int k, int iterations, int runs) {
