@@ -46,6 +46,25 @@ public final class JavaDFMovieLensALS {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
         SQLContext sqlContext = new SQLContext(sc);
 
+        // create data frame
+        DataFrame results = createDF(sqlContext, inputFile);
+
+        // split the dataset
+        DataFrame training = results.sample(true, .8);
+        DataFrame test = results.sample(true, .2);
+
+        org.apache.spark.ml.recommendation.ALS als = new org.apache.spark.ml.recommendation.ALS();
+        als.setUserCol("user").setItemCol("movie").setRank(rank).setMaxIter(iterations);
+        ALSModel model =  als.fit(training);
+
+        DataFrame pred = model.transform(test);
+        pred.show();
+
+        sc.stop();
+
+    }
+
+    public static DataFrame createDF(SQLContext sqlContext, String inputFile) {
         // options
         HashMap<String, String> options = new HashMap<String, String>();
         options.put("header", "false");
@@ -68,25 +87,7 @@ public final class JavaDFMovieLensALS {
         results.printSchema();
         results.show();
 
-        // split the dataset
-        DataFrame training = results.sample(true, .8);
-        DataFrame test = results.sample(true, .2);
-
-        org.apache.spark.ml.recommendation.ALS als = new org.apache.spark.ml.recommendation.ALS();
-        als.setUserCol("user").setItemCol("movie").setRank(rank).setMaxIter(iterations);
-        ALSModel model =  als.fit(training);
-
-        DataFrame pred = model.transform(test);
-        pred.show();
-
-        /*
-        DataFrame ddddf = sqlContext.sql("CREATE TEMPORARY TABLE ratings (user int, movie int, rating int)\n" +
-                "USING com.databricks.spark.csv\n" +
-                "OPTIONS (path \"/Users/jayant/oldmac/workcodejayant/spark-ml-graphx/data/movielens/ratings/ratings.csv\", header \"false\")");
-        */
-
-        sc.stop();
-
+        return results;
     }
 
 }
