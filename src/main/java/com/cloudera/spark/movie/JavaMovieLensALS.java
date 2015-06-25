@@ -69,15 +69,8 @@ public final class JavaMovieLensALS {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         // create RDD
-        JavaRDD<String> lines = sc.textFile(inputFile);
-
-        JavaRDD<Rating> ratings = lines.map(new Function<String, Rating>() {
-            @Override
-            public Rating call(String s) throws Exception {
-                String[] arr = s.split("::");
-                return new Rating(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), Double.parseDouble(arr[2]));
-            }
-        }).cache();
+        JavaRDD<Rating> ratings = createRDD(sc, inputFile);
+        ratings.cache();
 
         // count
         long numRatings = ratings.count();
@@ -121,6 +114,22 @@ public final class JavaMovieLensALS {
 
         sc.stop();
 
+    }
+
+    public static JavaRDD<Rating> createRDD(JavaSparkContext sc, String inputFile) {
+
+        // create RDD
+        JavaRDD<String> lines = sc.textFile(inputFile);
+
+        JavaRDD<Rating> ratings = lines.map(new Function<String, Rating>() {
+            @Override
+            public Rating call(String s) throws Exception {
+                String[] arr = s.split("::");
+                return new Rating(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), Double.parseDouble(arr[2]));
+            }
+        });
+
+        return ratings;
     }
 
     /** Compute RMSE (Root Mean Squared Error). */
