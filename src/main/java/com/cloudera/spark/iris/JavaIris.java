@@ -7,6 +7,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.mllib.clustering.KMeans;
 import org.apache.spark.mllib.clustering.KMeansModel;
+import org.apache.spark.mllib.linalg.Matrix;
 import org.apache.spark.mllib.linalg.Vector;
 import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.stat.MultivariateStatisticalSummary;
@@ -78,6 +79,9 @@ public class JavaIris {
         // print summary statistics
         summaryStatistics(points);
 
+        // correlation
+        correlation(points);
+
         // cluster
         cluster(points, k, iterations, runs);
 
@@ -93,6 +97,13 @@ public class JavaIris {
         System.out.println("Non-zeros : "+summary.numNonzeros()); // number of nonzeros in each column
     }
 
+    public static void correlation(JavaRDD<Vector> points) {
+        Matrix matrix = Statistics.corr(points.rdd());
+
+        String str = matrix.toString();
+        System.out.println(str);
+    }
+    
     public static void cluster(JavaRDD<Vector> points, int k, int iterations, int runs) {
 
         // train
