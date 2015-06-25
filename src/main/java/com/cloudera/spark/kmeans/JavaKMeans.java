@@ -49,6 +49,14 @@ public final class JavaKMeans {
         }
     }
 
+    public static JavaRDD<Vector> createRDD(JavaSparkContext sc, String inputFile) {
+        JavaRDD<String> lines = sc.textFile(inputFile);
+
+        JavaRDD<Vector> points = lines.map(new ParsePoint());
+
+        return points;
+    }
+
     public static void main(String[] args) {
         if (args.length < 3) {
             System.err.println(
@@ -68,16 +76,19 @@ public final class JavaKMeans {
         SparkConfUtil.setConf(sparkConf);
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
-        JavaRDD<String> lines = sc.textFile(inputFile);
+        // create RDD
+        JavaRDD<Vector> points = createRDD(sc, inputFile);
 
-        JavaRDD<Vector> points = lines.map(new ParsePoint());
-
+        // train
         KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());
 
+        // print cluster centers
         System.out.println("Cluster centers:");
         for (Vector center : model.clusterCenters()) {
             System.out.println(" " + center);
         }
+
+        // compute cost
         double cost = model.computeCost(points.rdd());
         System.out.println("Cost: " + cost);
 
