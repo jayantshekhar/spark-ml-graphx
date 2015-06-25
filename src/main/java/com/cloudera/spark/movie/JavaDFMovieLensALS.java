@@ -68,13 +68,17 @@ public final class JavaDFMovieLensALS {
         results.printSchema();
         results.show();
 
+        // split the dataset
+        DataFrame training = results.sample(true, .8);
+        DataFrame test = results.sample(true, .2);
+
         org.apache.spark.ml.recommendation.ALS als = new org.apache.spark.ml.recommendation.ALS();
         als.setUserCol("user").setItemCol("movie").setRank(rank).setMaxIter(iterations);
-        ALSModel model =  als.fit(results);
+        ALSModel model =  als.fit(training);
 
-        DataFrame pred = model.transform(results);
+        DataFrame pred = model.transform(test);
         pred.show();
-        
+
         /*
         DataFrame ddddf = sqlContext.sql("CREATE TEMPORARY TABLE ratings (user int, movie int, rating int)\n" +
                 "USING com.databricks.spark.csv\n" +

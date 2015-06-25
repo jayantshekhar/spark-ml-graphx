@@ -28,6 +28,12 @@
   <dependencies>
 
     <dependency>
+        <groupId>com.databricks</groupId>
+        <artifactId>spark-csv_${scala.minor.version}</artifactId>
+        <version>1.0.3</version>
+    </dependency>
+
+    <dependency>
         <groupId>org.apache.kafka</groupId>
         <artifactId>kafka_${scala.minor.version}</artifactId>
         <version>${kafka.version}</version>
