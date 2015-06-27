@@ -19,6 +19,7 @@ package com.cloudera.spark.movie;
 
 import java.util.regex.Pattern;
 
+import com.cloudera.spark.dataset.DatasetMovieLens;
 import com.cloudera.spark.mllib.SparkConfUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaDoubleRDD;
@@ -69,7 +70,7 @@ public final class JavaMovieLensALS {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         // create RDD
-        JavaRDD<Rating> ratings = createRDD(sc, inputFile);
+        JavaRDD<Rating> ratings = DatasetMovieLens.createRDD(sc, inputFile);
         ratings.cache();
 
         // count
@@ -114,22 +115,6 @@ public final class JavaMovieLensALS {
 
         sc.stop();
 
-    }
-
-    public static JavaRDD<Rating> createRDD(JavaSparkContext sc, String inputFile) {
-
-        // create RDD
-        JavaRDD<String> lines = sc.textFile(inputFile);
-
-        JavaRDD<Rating> ratings = lines.map(new Function<String, Rating>() {
-            @Override
-            public Rating call(String s) throws Exception {
-                String[] arr = s.split("::");
-                return new Rating(Integer.parseInt(arr[0]), Integer.parseInt(arr[1]), Double.parseDouble(arr[2]));
-            }
-        });
-
-        return ratings;
     }
 
     /** Compute RMSE (Root Mean Squared Error). */

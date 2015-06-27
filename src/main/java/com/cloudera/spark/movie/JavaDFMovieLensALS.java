@@ -1,5 +1,6 @@
 package com.cloudera.spark.movie;
 
+import com.cloudera.spark.dataset.DatasetMovieLens;
 import com.cloudera.spark.mllib.SparkConfUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -40,7 +41,7 @@ public final class JavaDFMovieLensALS {
         SQLContext sqlContext = new SQLContext(sc);
 
         // create data frame
-        DataFrame results = createDF(sqlContext, inputFile);
+        DataFrame results = DatasetMovieLens.createDF(sqlContext, inputFile);
 
         // split the dataset
         DataFrame training = results.sample(true, .8);
@@ -55,32 +56,6 @@ public final class JavaDFMovieLensALS {
 
         sc.stop();
 
-    }
-
-    public static DataFrame createDF(SQLContext sqlContext, String inputFile) {
-        // options
-        HashMap<String, String> options = new HashMap<String, String>();
-        options.put("header", "false");
-        options.put("path", inputFile);
-        options.put("delimiter", ",");
-
-        // create dataframe from input file
-        DataFrame df = sqlContext.load("com.databricks.spark.csv", options);
-        df.printSchema();
-
-        // name the columns
-        DataFrame newdf = df.toDF("user", "movie", "rating");
-        newdf.printSchema();
-
-        // register as a temporary table
-        newdf.registerTempTable("ratings");
-
-        // convert to proper types
-        DataFrame results = sqlContext.sql("SELECT cast(user as int) user, cast(movie as int) movie, cast(rating as int) rating FROM ratings");
-        results.printSchema();
-        results.show();
-
-        return results;
     }
 
 }

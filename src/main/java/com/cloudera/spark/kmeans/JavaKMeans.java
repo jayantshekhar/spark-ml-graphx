@@ -19,6 +19,7 @@ package com.cloudera.spark.kmeans;
 
 import java.util.regex.Pattern;
 
+import com.cloudera.spark.dataset.DatasetKMeans;
 import com.cloudera.spark.mllib.SparkConfUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -34,28 +35,6 @@ import org.apache.spark.mllib.linalg.Vectors;
  * Example using MLlib KMeans from Java.
  */
 public final class JavaKMeans {
-
-    private static class ParsePoint implements Function<String, Vector> {
-        private static final Pattern SPACE = Pattern.compile(" ");
-
-        @Override
-        public Vector call(String line) {
-            String[] tok = SPACE.split(line);
-            double[] point = new double[tok.length];
-            for (int i = 0; i < tok.length; ++i) {
-                point[i] = Double.parseDouble(tok[i]);
-            }
-            return Vectors.dense(point);
-        }
-    }
-
-    public static JavaRDD<Vector> createRDD(JavaSparkContext sc, String inputFile) {
-        JavaRDD<String> lines = sc.textFile(inputFile);
-
-        JavaRDD<Vector> points = lines.map(new ParsePoint());
-
-        return points;
-    }
 
     public static void main(String[] args) {
         if (args.length < 3) {
@@ -77,7 +56,7 @@ public final class JavaKMeans {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         // create RDD
-        JavaRDD<Vector> points = createRDD(sc, inputFile);
+        JavaRDD<Vector> points = DatasetKMeans.createRDD(sc, inputFile);
 
         // train
         KMeansModel model = KMeans.train(points.rdd(), k, iterations, runs, KMeans.K_MEANS_PARALLEL());

@@ -1,5 +1,6 @@
 package com.cloudera.spark.iris;
 
+import com.cloudera.spark.dataset.DatasetIris;
 import com.cloudera.spark.mllib.SparkConfUtil;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,29 +26,6 @@ import java.util.regex.Pattern;
 public class JavaIris {
 
 
-    private static class ParsePoint implements Function<String, Vector> {
-        private static final Pattern COMMA = Pattern.compile(",");
-
-        @Override
-        public Vector call(String line) {
-            String[] tok = COMMA.split(line);
-            double[] point = new double[tok.length-1];
-            for (int i = 0; i < tok.length-1; ++i) {
-                point[i] = Double.parseDouble(tok[i]);
-            }
-            return Vectors.dense(point);
-        }
-    }
-
-
-    public static JavaRDD<Vector> createRDD(JavaSparkContext sc, String inputFile) {
-        JavaRDD<String> lines = sc.textFile(inputFile);
-
-        JavaRDD<Vector> points = lines.map(new ParsePoint());
-
-        return points;
-    }
-
     public static void main(String[] args) {
         if (args.length < 3) {
             System.err.println(
@@ -68,7 +46,7 @@ public class JavaIris {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         // create RDD
-        JavaRDD<Vector> points = createRDD(sc, inputFile);
+        JavaRDD<Vector> points = DatasetIris.createRDD(sc, inputFile);
 
         // print the first 5 records
         List<Vector> list = points.take(5);
