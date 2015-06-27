@@ -41,7 +41,7 @@ public final class JavaRandomForest {
      * For information on multiclass classification, please refer to the JavaDecisionTree.java
      * example.
      */
-    private static void testClassification(JavaRDD<LabeledPoint> trainingData,
+    public static void testClassification(JavaRDD<LabeledPoint> trainingData,
                                            JavaRDD<LabeledPoint> testData) {
         // Train a RandomForest model.
         //  Empty categoricalFeaturesInfo indicates all features are continuous.
@@ -77,7 +77,7 @@ public final class JavaRandomForest {
         System.out.println("Learned classification forest model:\n" + model.toDebugString());
     }
 
-    private static void testRegression(JavaRDD<LabeledPoint> trainingData,
+    public static void testRegression(JavaRDD<LabeledPoint> trainingData,
                                        JavaRDD<LabeledPoint> testData) {
         // Train a RandomForest model.
         //  Empty categoricalFeaturesInfo indicates all features are continuous.

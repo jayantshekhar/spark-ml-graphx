@@ -3,6 +3,7 @@ package com.cloudera.spark.titanic;
 import com.cloudera.spark.dataset.DatasetMovieLens;
 import com.cloudera.spark.dataset.DatasetTitanic;
 import com.cloudera.spark.mllib.SparkConfUtil;
+import com.cloudera.spark.randomforest.JavaRandomForest;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -40,9 +41,18 @@ public class JavaTitanic {
 
         results.printSchema();
 
-        JavaRDD<LabeledPoint> rdd = DatasetTitanic.createLabeledPointsRDD(sc, sqlContext, inputFile);
+        JavaRDD<LabeledPoint> data = DatasetTitanic.createLabeledPointsRDD(sc, sqlContext, inputFile);
 
-        long count = rdd.count();
+        // Split the data into training and test sets (30% held out for testing)
+        JavaRDD<LabeledPoint>[] splits = data.randomSplit(new double[]{0.7, 0.3});
+        JavaRDD<LabeledPoint> trainingData = splits[0];
+        JavaRDD<LabeledPoint> testData = splits[1];
+
+        System.out.println("\nRunning example of classification using RandomForest\n");
+        JavaRandomForest.testClassification(trainingData, testData);
+
+        System.out.println("\nRunning example of regression using RandomForest\n");
+        JavaRandomForest.testRegression(trainingData, testData);
 
         sc.stop();
 
