@@ -24,9 +24,7 @@ import org.apache.spark.api.java.JavaDoubleRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.regression.LinearRegressionModel;
-import org.apache.spark.mllib.regression.LinearRegressionWithSGD;
+import org.apache.spark.mllib.regression.*;
 import scala.Tuple2;
 
 import java.util.List;
@@ -60,6 +58,21 @@ public class JavaHousing {
             System.out.println(v.toString());
         }
 
+        // linear regression with SGD
+        linearRegressionWithSGD(sc, parsedData);
+
+        // ridge regression with SGD
+        ridgeRegressionWithSGD(sc, parsedData);
+
+        // lasso with SGD
+        lassoWithSGD(sc, parsedData);
+
+
+        sc.stop();
+    }
+
+    private static void linearRegressionWithSGD(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData) {
+
         // Building the model
         int numIterations = 20;
         final LinearRegressionModel model =
@@ -89,7 +102,72 @@ public class JavaHousing {
         model.save(sc.sc(), "myModelPath");
         LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
 
-        sc.stop();
     }
 
+
+    private static void ridgeRegressionWithSGD(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData) {
+
+        // Building the model
+        int numIterations = 20;
+        final RidgeRegressionModel model =
+                RidgeRegressionWithSGD.train(JavaRDD.toRDD(parsedData), numIterations);
+
+        System.out.println(model.toString());
+
+        // Evaluate model on training examples and compute training error
+        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
+                new Function<LabeledPoint, Tuple2<Double, Double>>() {
+                    public Tuple2<Double, Double> call(LabeledPoint point) {
+                        double prediction = model.predict(point.features());
+                        return new Tuple2<Double, Double>(prediction, point.label());
+                    }
+                }
+        );
+        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
+                new Function<Tuple2<Double, Double>, Object>() {
+                    public Object call(Tuple2<Double, Double> pair) {
+                        return Math.pow(pair._1() - pair._2(), 2.0);
+                    }
+                }
+        ).rdd()).mean();
+        System.out.println("training Mean Squared Error = " + MSE);
+
+        // Save and load model
+        model.save(sc.sc(), "myModelPath");
+        LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
+
+    }
+
+    private static void lassoWithSGD(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData) {
+
+        // Building the model
+        int numIterations = 20;
+        final LassoModel model =
+                LassoWithSGD.train(JavaRDD.toRDD(parsedData), numIterations);
+
+        System.out.println(model.toString());
+
+        // Evaluate model on training examples and compute training error
+        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
+                new Function<LabeledPoint, Tuple2<Double, Double>>() {
+                    public Tuple2<Double, Double> call(LabeledPoint point) {
+                        double prediction = model.predict(point.features());
+                        return new Tuple2<Double, Double>(prediction, point.label());
+                    }
+                }
+        );
+        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
+                new Function<Tuple2<Double, Double>, Object>() {
+                    public Object call(Tuple2<Double, Double> pair) {
+                        return Math.pow(pair._1() - pair._2(), 2.0);
+                    }
+                }
+        ).rdd()).mean();
+        System.out.println("training Mean Squared Error = " + MSE);
+
+        // Save and load model
+        model.save(sc.sc(), "myModelPath");
+        LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
+
+    }
 }
