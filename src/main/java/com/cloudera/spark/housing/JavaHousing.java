@@ -61,9 +61,11 @@ public class JavaHousing {
         }
 
         // Building the model
-        int numIterations = 100;
+        int numIterations = 20;
         final LinearRegressionModel model =
                 LinearRegressionWithSGD.train(JavaRDD.toRDD(parsedData), numIterations);
+
+        System.out.println(model.toString());
 
         // Evaluate model on training examples and compute training error
         JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
