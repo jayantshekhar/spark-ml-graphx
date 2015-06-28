@@ -1,23 +1,35 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.cloudera.spark.housing;
 
 import com.cloudera.spark.dataset.DatasetHousing;
-import com.cloudera.spark.dataset.DatasetIris;
 import com.cloudera.spark.mllib.SparkConfUtil;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaDoubleRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.mllib.clustering.KMeans;
-import org.apache.spark.mllib.clustering.KMeansModel;
-import org.apache.spark.mllib.linalg.Matrix;
-import org.apache.spark.mllib.linalg.Vector;
-import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.regression.LabeledPoint;
-import org.apache.spark.mllib.stat.MultivariateStatisticalSummary;
-import org.apache.spark.mllib.stat.Statistics;
+import org.apache.spark.mllib.regression.LinearRegressionModel;
+import org.apache.spark.mllib.regression.LinearRegressionWithSGD;
+import scala.Tuple2;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * Created by jayant on 6/25/15.
@@ -39,13 +51,41 @@ public class JavaHousing {
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
         // create RDD
-        JavaRDD<LabeledPoint> points = DatasetHousing.createRDD(sc, inputFile);
+        JavaRDD<LabeledPoint> parsedData = DatasetHousing.createRDD(sc, inputFile);
+        parsedData.cache();
 
         // print the first 5 records
-        List<LabeledPoint> list = points.take(5);
+        List<LabeledPoint> list = parsedData.take(5);
         for (LabeledPoint v : list) {
             System.out.println(v.toString());
         }
+
+        // Building the model
+        int numIterations = 100;
+        final LinearRegressionModel model =
+                LinearRegressionWithSGD.train(JavaRDD.toRDD(parsedData), numIterations);
+
+        // Evaluate model on training examples and compute training error
+        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
+                new Function<LabeledPoint, Tuple2<Double, Double>>() {
+                    public Tuple2<Double, Double> call(LabeledPoint point) {
+                        double prediction = model.predict(point.features());
+                        return new Tuple2<Double, Double>(prediction, point.label());
+                    }
+                }
+        );
+        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
+                new Function<Tuple2<Double, Double>, Object>() {
+                    public Object call(Tuple2<Double, Double> pair) {
+                        return Math.pow(pair._1() - pair._2(), 2.0);
+                    }
+                }
+        ).rdd()).mean();
+        System.out.println("training Mean Squared Error = " + MSE);
+
+        // Save and load model
+        model.save(sc.sc(), "myModelPath");
+        LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
 
         sc.stop();
     }
