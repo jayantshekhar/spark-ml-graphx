@@ -80,6 +80,11 @@ public class JavaHousing {
 
         System.out.println(model.toString());
 
+        evaluateModel(sc, parsedData, model);
+    }
+
+    private static void evaluateModel(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData, final GeneralizedLinearModel model) {
+
         // Evaluate model on training examples and compute training error
         JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
                 new Function<LabeledPoint, Tuple2<Double, Double>>() {
@@ -99,8 +104,8 @@ public class JavaHousing {
         System.out.println("training Mean Squared Error = " + MSE);
 
         // Save and load model
-        model.save(sc.sc(), "myModelPath");
-        LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
+        //model.save(sc.sc(), "myModelPath");
+        //LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
 
     }
 
@@ -114,27 +119,15 @@ public class JavaHousing {
 
         System.out.println(model.toString());
 
-        // Evaluate model on training examples and compute training error
-        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
-                new Function<LabeledPoint, Tuple2<Double, Double>>() {
-                    public Tuple2<Double, Double> call(LabeledPoint point) {
-                        double prediction = model.predict(point.features());
-                        return new Tuple2<Double, Double>(prediction, point.label());
-                    }
-                }
-        );
-        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
-                new Function<Tuple2<Double, Double>, Object>() {
-                    public Object call(Tuple2<Double, Double> pair) {
-                        return Math.pow(pair._1() - pair._2(), 2.0);
-                    }
-                }
-        ).rdd()).mean();
-        System.out.println("training Mean Squared Error = " + MSE);
+        evaluateModel(sc, parsedData, model);
+
+        /***
 
         // Save and load model
         model.save(sc.sc(), "myModelPath");
         LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
+
+         ***/
 
     }
 
@@ -147,27 +140,14 @@ public class JavaHousing {
 
         System.out.println(model.toString());
 
-        // Evaluate model on training examples and compute training error
-        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
-                new Function<LabeledPoint, Tuple2<Double, Double>>() {
-                    public Tuple2<Double, Double> call(LabeledPoint point) {
-                        double prediction = model.predict(point.features());
-                        return new Tuple2<Double, Double>(prediction, point.label());
-                    }
-                }
-        );
-        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
-                new Function<Tuple2<Double, Double>, Object>() {
-                    public Object call(Tuple2<Double, Double> pair) {
-                        return Math.pow(pair._1() - pair._2(), 2.0);
-                    }
-                }
-        ).rdd()).mean();
-        System.out.println("training Mean Squared Error = " + MSE);
+        evaluateModel(sc, parsedData, model);
+
+        /***
 
         // Save and load model
         model.save(sc.sc(), "myModelPath");
         LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
+        ***/
 
     }
 }
