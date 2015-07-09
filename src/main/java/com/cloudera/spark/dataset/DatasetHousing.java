@@ -33,11 +33,14 @@ public class DatasetHousing {
                     public LabeledPoint call(String line) {
                         String[] parts = line.split(",");
 
+                        // label : price
                         Double price = Double.parseDouble(parts[1]);
 
-                        double[] v = new double[2];
+                        double[] v = new double[4];
                         v[0] = Double.parseDouble(parts[2]); // lotsize
                         v[1] = Double.parseDouble(parts[3]); // bedrooms
+                        v[2] = Double.parseDouble(parts[4]); // bathrooms
+                        v[3] = Double.parseDouble(parts[5]); // stories
 
                         return new LabeledPoint(price, Vectors.dense(v));
                     }
