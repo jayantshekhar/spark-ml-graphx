@@ -31,7 +31,7 @@ object PageRank {
     val ranks = graph.pageRank(0.0001).vertices
 
     // Join the ranks with the usernames
-    val users = sc.textFile("graphx/data/users.txt").map { line =>
+    val users = sc.textFile("datagraphx/users").map { line =>
       val fields = line.split(",")
       (fields(0).toLong, fields(1))
     }
@@ -41,7 +41,7 @@ object PageRank {
 
     // Print the result
     println(ranksByUsername.collect().mkString("\n"))
-    
+
     sc.stop()
   }
 }

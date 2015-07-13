@@ -9,9 +9,9 @@ import org.apache.spark.graphx.{GraphLoader, Edge, Graph}
 
 object DatasetFollowers {
 
-  def graph(sc : SparkContext): Graph[(String, Int), Int] = {
+  def graph(sc : SparkContext): Graph[Int, Int] = {
 
-    val graph = GraphLoader.edgeListFile(sc, "graphx/data/followers.txt")
+    val graph = GraphLoader.edgeListFile(sc, "datagraphx/followers")
 
     graph
 
