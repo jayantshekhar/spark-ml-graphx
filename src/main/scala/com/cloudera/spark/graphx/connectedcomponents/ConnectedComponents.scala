@@ -1,4 +1,4 @@
-package com.cloudera.spark.graphx.pagerank
+package com.cloudera.spark.graphx.connectedcomponents
 
 import com.cloudera.spark.graphx.dataset.{DatasetUsers, DatasetFollowers, DatasetSimpleGraph}
 import com.cloudera.spark.mllib.SparkConfUtil
@@ -7,17 +7,17 @@ import org.apache.spark.{SparkContext, SparkConf}
 /**
  * Created by jayant on 7/12/15.
  */
-object PageRank {
+object ConnectedComponents {
 
   def main(args: Array[String]) {
 
-    pageRank()
+    connectedComponents()
 
   }
 
-  def pageRank(): Unit = {
+  def connectedComponents(): Unit = {
     println("======================================")
-    println("|             Page Rank              |")
+    println("|             Connected Components   |")
     println("======================================")
 
     val sparkConf: SparkConf = new SparkConf().setAppName("Test")
@@ -27,18 +27,18 @@ object PageRank {
     // Load the edges as a graph
     val graph = DatasetFollowers.graph(sc)
 
-    // Run PageRank
-    val ranks = graph.pageRank(0.0001).vertices
+    // Find the connected components
+    val cc = graph.connectedComponents().vertices
 
-    // Join the ranks with the usernames
+    // Join the connected components with the usernames
     val users = DatasetUsers.users(sc)
 
-    val ranksByUsername = users.join(ranks).map {
-      case (id, (username, rank)) => (username, rank)
+    val ccByUsername = users.join(cc).map {
+      case (id, (username, cc)) => (username, cc)
     }
 
     // Print the result
-    println(ranksByUsername.collect().mkString("\n"))
+    println(ccByUsername.collect().mkString("\n"))
 
     sc.stop()
   }
