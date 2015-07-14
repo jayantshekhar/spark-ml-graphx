@@ -10,10 +10,12 @@ object WikipediaPageRank {
 
   def main(args: Array[String]): Unit = {
 
+    // spark context
     val sparkConf: SparkConf = new SparkConf().setAppName("Wikipedia Page Rank")
     SparkConfUtil.setConf(sparkConf)
     val sc: SparkContext = new SparkContext(sparkConf)
 
+    // RDD's
     val articles: RDD[String] = sc.textFile("datagraphx/wikipedia/vertices.txt")
     val links: RDD[String] = sc.textFile("datagraphx/wikipedia/edges.txt")
 
@@ -36,7 +38,6 @@ object WikipediaPageRank {
 
     println(graph.vertices.count())
     println(graph.triplets.count)
-
     graph.triplets.take(5).foreach(println(_))
 
     // pagerank

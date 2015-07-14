@@ -128,16 +128,20 @@ public final class JavaRandomForest {
         // Load and parse the data file.
         String datapath = "data/svm";
         JavaRDD<LabeledPoint> data = MLUtils.loadLibSVMFile(sc.sc(), datapath).toJavaRDD();
+
         // Split the data into training and test sets (30% held out for testing)
         JavaRDD<LabeledPoint>[] splits = data.randomSplit(new double[]{0.7, 0.3});
         JavaRDD<LabeledPoint> trainingData = splits[0];
         JavaRDD<LabeledPoint> testData = splits[1];
 
+        // classification using RandomForest
         System.out.println("\nRunning example of classification using RandomForest\n");
         testClassification(trainingData, testData);
 
+        // regression using RandomForest
         System.out.println("\nRunning example of regression using RandomForest\n");
         testRegression(trainingData, testData);
+        
         sc.stop();
     }
 }

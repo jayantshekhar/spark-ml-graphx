@@ -29,7 +29,6 @@ public class JavaTitanic {
         // input parameters
         String inputFile = args[0];
 
-
         // spark context
         SparkConf sparkConf = new SparkConf().setAppName("JavaTitanic");
         SparkConfUtil.setConf(sparkConf);
@@ -41,6 +40,7 @@ public class JavaTitanic {
 
         results.printSchema();
 
+        // LabeledPoint RDD
         JavaRDD<LabeledPoint> data = DatasetTitanic.createLabeledPointsRDD(sc, sqlContext, inputFile);
 
         // Split the data into training and test sets (30% held out for testing)
@@ -48,9 +48,11 @@ public class JavaTitanic {
         JavaRDD<LabeledPoint> trainingData = splits[0];
         JavaRDD<LabeledPoint> testData = splits[1];
 
+        // classification using RandomForest
         System.out.println("\nRunning example of classification using RandomForest\n");
         JavaRandomForest.testClassification(trainingData, testData);
 
+        // regression using Random Forest
         System.out.println("\nRunning example of regression using RandomForest\n");
         JavaRandomForest.testRegression(trainingData, testData);
 
