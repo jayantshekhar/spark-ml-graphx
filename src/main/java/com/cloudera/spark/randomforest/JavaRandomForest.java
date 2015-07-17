@@ -46,7 +46,10 @@ public final class JavaRandomForest {
         // Train a RandomForest model.
         //  Empty categoricalFeaturesInfo indicates all features are continuous.
         Integer numClasses = 2;
+
+        // storing arity of categorical features. E.g., an entry (n -> k) indicates that feature n is categorical with k categories indexed from 0: {0, 1, ..., k-1}
         HashMap<Integer, Integer> categoricalFeaturesInfo = new HashMap<Integer, Integer>();
+
         Integer numTrees = 3; // Use more in practice.
         String featureSubsetStrategy = "auto"; // Let the algorithm choose.
         String impurity = "gini";
@@ -58,7 +61,7 @@ public final class JavaRandomForest {
                 categoricalFeaturesInfo, numTrees, featureSubsetStrategy, impurity, maxDepth, maxBins,
                 seed);
 
-        // Evaluate model on test instances and compute test error
+        // Evaluate model on test instances
         JavaPairRDD<Double, Double> predictionAndLabel =
                 testData.mapToPair(new PairFunction<LabeledPoint, Double, Double>() {
                     @Override
@@ -66,6 +69,8 @@ public final class JavaRandomForest {
                         return new Tuple2<Double, Double>(model.predict(p.features()), p.label());
                     }
                 });
+
+        // compute test error
         Double testErr =
                 1.0 * predictionAndLabel.filter(new Function<Tuple2<Double, Double>, Boolean>() {
                     @Override
@@ -141,7 +146,7 @@ public final class JavaRandomForest {
         // regression using RandomForest
         System.out.println("\nRunning example of regression using RandomForest\n");
         testRegression(trainingData, testData);
-        
+
         sc.stop();
     }
 }
