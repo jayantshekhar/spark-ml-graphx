@@ -23,12 +23,17 @@ import com.cloudera.spark.mllib.SparkConfUtil;
 import com.cloudera.spark.randomforest.JavaRandomForest;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaDoubleRDD;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.mllib.regression.*;
+import org.apache.spark.mllib.tree.RandomForest;
+import org.apache.spark.mllib.tree.model.RandomForestModel;
 import scala.Tuple2;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -67,47 +72,67 @@ public class JavaCovtype {
 
         // classification using RandomForest
         System.out.println("\nRunningclassification using RandomForest\n");
-        JavaRandomForest.testClassification(trainingData, testData);
+        classify(trainingData, testData);
 
         sc.stop();
     }
 
-    private static void linearRegressionWithSGD(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData) {
+    /**
+     * Note: This example illustrates binary classification.
+     * For information on multiclass classification, please refer to the JavaDecisionTree.java
+     * example.
+     */
+    public static void classify(JavaRDD<LabeledPoint> trainingData,
+                                          JavaRDD<LabeledPoint> testData) {
 
-        // Building the model
-        int numIterations = 20;
-        final LinearRegressionModel model =
-                LinearRegressionWithSGD.train(JavaRDD.toRDD(parsedData), numIterations);
+        trainingData.cache();
+        testData.cache();
 
+        // Train a RandomForest model.
+        //  Empty categoricalFeaturesInfo indicates all features are continuous.
+        Integer numClasses = 7;
+
+        // storing arity of categorical features. E.g., an entry (n -> k) indicates that feature n is categorical
+        // with k categories indexed from 0: {0, 1, ..., k-1}
+        HashMap<Integer, Integer> categoricalFeaturesInfo = new HashMap<Integer, Integer>();
+        categoricalFeaturesInfo.put(10, 4);
+        categoricalFeaturesInfo.put(11, 40);
+
+        Integer numTrees = 10; // Use more in practice.
+        String featureSubsetStrategy = "auto"; // Let the algorithm choose.
+        String impurity = "entropy"; // gini/entropy
+        Integer maxDepth = 20;
+        Integer maxBins = 300;
+        Integer seed = 12345;
+
+
+        long featuresize = trainingData.take(1).get(0).features().size();
+
+        final RandomForestModel model = RandomForest.trainClassifier(trainingData, numClasses,
+                categoricalFeaturesInfo, numTrees, featureSubsetStrategy, impurity, maxDepth, maxBins, seed);
+
+        // Evaluate model on test instances
+        JavaPairRDD<Double, Double> predictionAndLabel =
+                testData.mapToPair(new PairFunction<LabeledPoint, Double, Double>() {
+                    @Override
+                    public Tuple2<Double, Double> call(LabeledPoint p) {
+                        return new Tuple2<Double, Double>(model.predict(p.features()), p.label());
+                    }
+                });
+
+        // print model
         System.out.println(model.toString());
 
-        evaluateModel(sc, parsedData, model);
-    }
-
-    private static void evaluateModel(JavaSparkContext sc, JavaRDD<LabeledPoint> parsedData, final GeneralizedLinearModel model) {
-
-        // Evaluate model on training examples and compute training error
-        JavaRDD<Tuple2<Double, Double>> valuesAndPreds = parsedData.map(
-                new Function<LabeledPoint, Tuple2<Double, Double>>() {
-                    public Tuple2<Double, Double> call(LabeledPoint point) {
-                        double prediction = model.predict(point.features());
-                        return new Tuple2<Double, Double>(prediction, point.label());
+        // compute test error
+        Double testErr =
+                1.0 * predictionAndLabel.filter(new Function<Tuple2<Double, Double>, Boolean>() {
+                    @Override
+                    public Boolean call(Tuple2<Double, Double> pl) {
+                        return !pl._1().equals(pl._2());
                     }
-                }
-        );
-        double MSE = new JavaDoubleRDD(valuesAndPreds.map(
-                new Function<Tuple2<Double, Double>, Object>() {
-                    public Object call(Tuple2<Double, Double> pair) {
-                        return Math.pow(pair._1() - pair._2(), 2.0);
-                    }
-                }
-        ).rdd()).mean();
-        System.out.println("training Mean Squared Error = " + MSE);
-
-        // Save and load model
-        //model.save(sc.sc(), "myModelPath");
-        //LinearRegressionModel sameModel = LinearRegressionModel.load(sc.sc(), "myModelPath");
-
+                }).count() / testData.count();
+        System.out.println("Test Error: " + testErr);
+        System.out.println("Learned classification forest model:\n" + model.toDebugString());
     }
 
 }
