@@ -15,7 +15,7 @@ object WikipediaPageRankFormat2 {
     SparkConfUtil.setConf(sparkConf)
     val sc: SparkContext = new SparkContext(sparkConf)
 
-    //Raw files being read
+    //Raw files being read : http://haselgrove.id.au/wikipedia.htm
     val rawLinks:RDD[String] = sc.textFile("datagraphx/wikipediaV2/links-simple-sorted-top100.txt");
     val rawVertex:RDD[String] = sc.textFile("datagraphx/wikipediaV2/titles-sorted-top500.txt");
 
