@@ -36,4 +36,15 @@ Run PageRank
 
 spark-submit --class com.cloudera.spark.graphx.pagerank.PageRank  --master yarn target/spark-mllib-1.0.jar
 
+Run Triangle Count
+------------------
+
+spark-submit --class com.cloudera.spark.graphx.triangle.TriangleCount  --master yarn target/spark-mllib-1.0.jar
+
+
+Run Wikipedia PageRank
+----------------------
+
+spark-submit --class com.cloudera.spark.graphx.wikipedia.WikipediaPageRankFormat2  --master yarn target/spark-mllib-1.0.jar
+
 
