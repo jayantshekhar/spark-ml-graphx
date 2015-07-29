@@ -18,6 +18,11 @@ Run Iris
 
 spark-submit --class com.cloudera.spark.iris.JavaIris  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/iris 3 5
 
+Run Covtype
+-----------
+
+spark-submit --class com.cloudera.spark.covtype.JavaCovtype  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/covtype
+
 
 Run FPGrowth
 ------------
