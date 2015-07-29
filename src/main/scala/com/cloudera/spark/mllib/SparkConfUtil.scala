@@ -8,8 +8,8 @@ import org.apache.spark.SparkConf
 object SparkConfUtil {
 
   def setConf(conf: SparkConf): Unit = {
-    conf.setMaster("local")
-    conf.set("spark.broadcast.compress", "false")
-    conf.set("spark.shuffle.compress", "false")
+    // conf.setMaster("local")
+    // conf.set("spark.broadcast.compress", "false")
+    // conf.set("spark.shuffle.compress", "false")
   }
 }
