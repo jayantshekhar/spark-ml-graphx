@@ -1,10 +1,17 @@
 # spark-ml-graphx
 
+BUILD
+-----
+
+	mvn package
+
+
 LOAD DATA INTO HDFS
 -------------------
 
 	hadoop fs -put data
 	hadoop fs -put datagraphx
+
 
 Run KMeans
 ----------
