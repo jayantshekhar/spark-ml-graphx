@@ -28,3 +28,12 @@ Run FPGrowth
 ------------
 
 spark-submit --class com.cloudera.spark.fpg.JavaFPGrowth  --master yarn target/spark-mllib-1.0.jar data/fpg
+
+
+
+Run PageRank
+------------
+
+spark-submit --class com.cloudera.spark.graphx.pagerank.PageRank  --master yarn target/spark-mllib-1.0.jar
+
+

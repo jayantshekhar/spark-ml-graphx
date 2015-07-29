@@ -1,7 +1,9 @@
-1,BarackObama,Barack Obama
-2,ladygaga,Goddess of Love
-3,jeresig,John Resig
-4,justinbieber,Justin Bieber
-6,matei_zaharia,Matei Zaharia
-7,odersky,Martin Odersky
-8,anonsys
+1,AlbertEinstein,Albert Einstein
+2,IsaacNewton,Isaac Newton
+3,MarieCurie,Marie Curie
+4,CharlesDarwin,Charles Darwin
+6,Aristotle,Aristotle
+7,Archimedes,Archimedes
+8,JamesMaxwell,James Maxwell
+9,MaxBorn,Max Born
+10,CarlSagan,Carl Sagan

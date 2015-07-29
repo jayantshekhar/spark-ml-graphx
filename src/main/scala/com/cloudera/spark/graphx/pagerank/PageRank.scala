@@ -20,7 +20,7 @@ object PageRank {
     println("|             Page Rank              |")
     println("======================================")
 
-    val sparkConf: SparkConf = new SparkConf().setAppName("Test")
+    val sparkConf: SparkConf = new SparkConf().setAppName("PageRank")
     SparkConfUtil.setConf(sparkConf)
     val sc: SparkContext = new SparkContext(sparkConf)
 
