@@ -42,6 +42,8 @@ public final class JavaKMeans {
                     "Usage: JavaKMeans <input_file> <k> <max_iterations> [<runs>]");
             System.exit(1);
         }
+
+        // parse the input arguments
         String inputFile = args[0];
         int k = Integer.parseInt(args[1]);
         int iterations = Integer.parseInt(args[2]);
@@ -51,6 +53,7 @@ public final class JavaKMeans {
             runs = Integer.parseInt(args[3]);
         }
 
+        // create Spark Context
         SparkConf sparkConf = new SparkConf().setAppName("JavaKMeans");
         SparkConfUtil.setConf(sparkConf);
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
