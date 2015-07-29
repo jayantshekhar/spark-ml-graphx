@@ -1,9 +1,9 @@
 
 <project>
-  <groupId>com.spark.recipes</groupId>
-  <artifactId>spark-recipes</artifactId>
+  <groupId>com.spark.mllib</groupId>
+  <artifactId>spark-mllib</artifactId>
   <modelVersion>4.0.0</modelVersion>
-  <name>SparkRecipes</name>
+  <name>MLlib-GraphX</name>
   <packaging>jar</packaging>
   <version>1.0</version>
 
