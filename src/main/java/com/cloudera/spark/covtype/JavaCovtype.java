@@ -51,7 +51,7 @@ public class JavaCovtype {
         }
         String inputFile = args[0];
 
-        SparkConf sparkConf = new SparkConf().setAppName("JavaHousing");
+        SparkConf sparkConf = new SparkConf().setAppName("JavaCovtype");
         SparkConfUtil.setConf(sparkConf);
         JavaSparkContext sc = new JavaSparkContext(sparkConf);
 
