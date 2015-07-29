@@ -16,7 +16,7 @@ spark-submit --class com.cloudera.spark.movie.JavaDFMovieLensALS  --master yarn 
 Run Iris
 --------
 
-spark-submit --class com.cloudera.spark.iris.JavaIris  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/iris 5 5
+spark-submit --class com.cloudera.spark.iris.JavaIris  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/iris 3 5
 
 
 Run FPGrowth
