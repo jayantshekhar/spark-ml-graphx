@@ -30,11 +30,11 @@ Run FPGrowth
 spark-submit --class com.cloudera.spark.fpg.JavaFPGrowth  --master yarn target/spark-mllib-1.0.jar data/fpg
 
 
+Run Wikipedia PageRank
+----------------------
 
-Run PageRank
-------------
+spark-submit --class com.cloudera.spark.graphx.wikipedia.WikipediaPageRankFormat2  --master yarn target/spark-mllib-1.0.jar
 
-spark-submit --class com.cloudera.spark.graphx.pagerank.PageRank  --master yarn target/spark-mllib-1.0.jar
 
 Run Triangle Count
 ------------------
@@ -42,9 +42,12 @@ Run Triangle Count
 spark-submit --class com.cloudera.spark.graphx.triangle.TriangleCount  --master yarn target/spark-mllib-1.0.jar
 
 
-Run Wikipedia PageRank
-----------------------
+Run PageRank
+------------
 
-spark-submit --class com.cloudera.spark.graphx.wikipedia.WikipediaPageRankFormat2  --master yarn target/spark-mllib-1.0.jar
+spark-submit --class com.cloudera.spark.graphx.pagerank.PageRank  --master yarn target/spark-mllib-1.0.jar
+
+
+
 
 
