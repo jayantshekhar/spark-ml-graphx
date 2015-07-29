@@ -125,10 +125,10 @@ public final class JavaMovieLensALS {
             }
         });
 
-        // predict
+        // predict test data
         JavaRDD<Rating> predictions = model.predict(userProductRDD);
 
-        // map to pair (user/product)
+        // map test data to pair (user/product) & rating
         JavaPairRDD<Tuple2<Integer, Integer>, Double> dataPair = data.mapToPair(new PairFunction<Rating, Tuple2<Integer, Integer>, Double>() {
             @Override
             public Tuple2<Tuple2<Integer, Integer>, Double> call(Rating rating) throws Exception {
@@ -137,7 +137,7 @@ public final class JavaMovieLensALS {
             }
         });
 
-        // map to pair (user/product)
+        // map predictions to pair (user/product) & rating
         JavaPairRDD<Tuple2<Integer, Integer>, Double> predictionsPair = predictions.mapToPair(new PairFunction<Rating, Tuple2<Integer, Integer>, Double>() {
             @Override
             public Tuple2<Tuple2<Integer, Integer>, Double> call(Rating rating) throws Exception {
@@ -146,7 +146,7 @@ public final class JavaMovieLensALS {
             }
         });
 
-        // join predictions to test data
+        // join predictions pair to test data pair
         JavaRDD<Tuple2<Double, Double>> origPredRatingRDD =  predictionsPair.join(dataPair).values();
 
         // compute rmse
