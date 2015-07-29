@@ -40,9 +40,6 @@ import org.apache.spark.mllib.recommendation.Rating;
 import scala.Tuple2;
 import org.apache.spark.SparkContext.*;
 
-/**
- * Example using MLlib KMeans from Java.
- */
 public final class JavaMovieLensALS {
 
     public static void main(String[] args) {
@@ -100,7 +97,7 @@ public final class JavaMovieLensALS {
         // count
         long numTrain = training.count();
         long numTest = test.count();
-        System.out.println("Num Train : " + numTest + " Num Test : " + numTest);
+        System.out.println("Num Train : " + numTrain + " Num Test : " + numTest);
 
         ratings.unpersist();
 
