@@ -13,6 +13,11 @@ Run DataFrames version of Movie Lens
 
 spark-submit --class com.cloudera.spark.movie.JavaDFMovieLensALS  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/movielens/ratings 5 5
 
+Run Iris
+--------
+
+spark-submit --class com.cloudera.spark.iris.JavaIris  --master yarn target/spark-mllib-1.0-jar-with-dependencies.jar data/iris 5 5
+
 
 Run FPGrowth
 ------------
