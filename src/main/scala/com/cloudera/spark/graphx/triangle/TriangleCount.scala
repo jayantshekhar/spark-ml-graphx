@@ -35,6 +35,7 @@ object TriangleCount {
     val bbb = indegrees.collect();
     println(bbb.mkString(" "))
 
+    // number of triangles passing through each vertex
     val triangles = graph.triangleCount()
 
     val numv = triangles.numVertices
