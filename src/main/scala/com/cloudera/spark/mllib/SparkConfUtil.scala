@@ -7,9 +7,14 @@ import org.apache.spark.SparkConf
  */
 object SparkConfUtil {
 
+  val isLocal = false;
+
   def setConf(conf: SparkConf): Unit = {
-    // conf.setMaster("local")
-    // conf.set("spark.broadcast.compress", "false")
-    // conf.set("spark.shuffle.compress", "false")
+
+    if (isLocal) {
+     conf.setMaster("local")
+     conf.set("spark.broadcast.compress", "false")
+     conf.set("spark.shuffle.compress", "false")
+    }
   }
 }
